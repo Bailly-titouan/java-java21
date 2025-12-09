@@ -4,6 +4,10 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -61,14 +65,20 @@ public class Stream_08_Test {
 
         // TODO utiliser la méthode java.nio.file.Files.lines pour créer un stream de lignes du fichier naissances_depuis_1900.csv
         // Le bloc try(...) permet de fermer (close()) le stream après utilisation
-        try (Stream<String> lines = null) {
+
+        Path path = Paths.get(ClassLoader.getSystemClassLoader().getResource("naissances_depuis_1900.csv").toURI());
+
+        try (Stream<String> lines = Files.lines(path)) {
 
             // TODO construire une MAP (clé = année de naissance, valeur = somme des nombres de naissance de l'année)
-            Map<String, Integer> result = null;
+            Map<String, Integer> result = lines.map();
 
 
             assertThat(result.get("2015"), is(8097));
             assertThat(result.get("1900"), is(5130));
+        }
+        finally {
+
         }
     }
 
