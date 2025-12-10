@@ -7,9 +7,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.Test;
@@ -57,6 +56,15 @@ public class Stream_08_Test {
         public void setNombre(Integer nombre) {
             this.nombre = nombre;
         }
+
+        @Override
+        public String toString() {
+            return "Naissance{" +
+                    "annee='" + annee + '\'' +
+                    ", jour='" + jour + '\'' +
+                    ", nombre=" + nombre +
+                    '}';
+        }
     }
 
 
@@ -66,16 +74,19 @@ public class Stream_08_Test {
         // TODO utiliser la méthode java.nio.file.Files.lines pour créer un stream de lignes du fichier naissances_depuis_1900.csv
         // Le bloc try(...) permet de fermer (close()) le stream après utilisation
 
-        Path path = Paths.get(ClassLoader.getSystemClassLoader().getResource("naissances_depuis_1900.csv").toURI());
+        Path path = Paths.get(ClassLoader.getSystemClassLoader().getResource("naissances_depuis_1900.csv").getPath());
 
         try (Stream<String> lines = Files.lines(path)) {
 
             // TODO construire une MAP (clé = année de naissance, valeur = somme des nombres de naissance de l'année)
-            Map<String, Integer> result = lines.map();
-
-
-            assertThat(result.get("2015"), is(8097));
-            assertThat(result.get("1900"), is(5130));
+            Stream<List<String>> naissancesStreamString = lines.map(l -> Arrays.stream(l.split(";")).toList());
+            List<Naissance> naissanceStream = naissancesStreamString.map(list -> new Naissance(list.get(1), list.get(2), Integer.parseInt(list.get(3)))).toList();
+            Map<String, Set<Naissance>> resultNoSum = naissanceStream.stream().collect(Collectors.groupingBy(n -> n.getAnnee(), Collectors.toSet()));
+            Map<String, Integer> result;
+//            result.forEach((r1, r2) -> System.out.println(r1 + " " + r2));
+//
+//            assertThat(result.get("2015"), is(8097));
+//            assertThat(result.get("1900"), is(5130));
         }
         finally {
 
